@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Flash Cards</title>
+    <!-- We've provided some styles for you, aren't we nice? -->
+    <link rel="stylesheet" type="text/css" href="reset.css" />
+    <link rel="stylesheet" type="text/css" href="style.css" />
+  </head>
+  <body>
+    <div ng-app="FlashCardApp">
+      <div ng-controller="StatsController" id="statistics">
+        <div id="scoreboard">
+          <h3>Correct: <span>{{ scores.correct }}</span></h3>
+          <h3>Incorrect: <span>{{ scores.incorrect }}</span></h3>
+        </div>
+      </div>
+      <div ng-controller="NewCardController">
+      {{newCardForm.$valid}}
+        <form name="newCardForm" ng-submit="submitted=true; newCardForm.$valid && submit()" novalidate>
+          <pre>{{newCard | json}}</pre>
+
+          <input type="text" name="question" ng-model="newCard.question" required ng-minLength="15">
+          <div ng-show="submitted && newCardForm.question.$invalid">
+              Question is a required field
+          </div>
+          <div ng-show="submitted && newCardForm.question.$error.minlength">
+              Question is too short
+          </div>
+
+          <select name="category" ng-model="newCard.category" required>
+            <option>MongoDB</option>
+            <option>Express</option>
+            <option>Angular</option>
+            <option>Node</option>
+          </select>
+          <div ng-show="submitted && newCardForm.category.$invalid">
+              Category is a required field
+          </div>
+
+          <div ng-repeat="answer in newCard.answers">
+            <input type="text" name="answer{{$index}}" ng-model="answer.text" ng-maxLength="40">
+            <div ng-show="submitted && newCardForm.answer{{$index}}.$error.maxlength">
+                Answer is too long
+            </div>
+            <input type="checkbox" ng-model="answer.correct">Correct?
+          </div>
+          <input type="submit" value="Submit">
+        </form>
+      </div>
+      <div ng-controller="MainCtrl">
+        <button
+        ng-repeat="category in categories"
+        class="category-button"
+        ng-click="filterByCategory(category)"
+        ng-class="{active: activeCat == category}">{{ category }}</button>
+        <loader ng-hide="flashCards"></loader>
+        <flash-card
+        ng-repeat="flashCard in flashCards | orderBy: 'question'"
+        card="flashCard"
+        ></flash-card>
+      </div>
+    </div>
+    <script src="angular.js"></script>
+    <script src="app.js"></script>
+    <script src="controllers/flashCard.controller.js"></script>
+    <script src="controllers/main.controller.js"></script>
+    <script src="controllers/stats.controller.js"></script>
+    <script src="controllers/newCard.controller.js"></script>
+    <script src="factories/flashCard.factory.js"></script>
+    <script src="factories/score.factory.js"></script>
+    <script src="factories/newCard.factory.js"></script>
+    <script src="directives/loader/loader.directive.js"></script>
+    <script src="directives/flashCard/flashCard.directive.js"></script>
+    <script src="directives/borderOnHover/borderOnHover.directive.js"></script>
+  </body>
+</html>
